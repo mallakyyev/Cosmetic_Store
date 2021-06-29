@@ -1,0 +1,81 @@
+﻿@model Cosmetics.BLL.DTO.ProductModelDTO.ProductDTO
+@using Cosmetics.BLL.DTO.ProductModelDTO;
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Cosmetics.Web
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = Model.ProductName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="content">
+
+    <section class="padding-top-40 padding-bottom-60">
+        <div class="container">
+            <div class="row">
+
+                <!-- Products -->
+                <div class="col-md-12">
+                    <div class="product-detail">
+                        <div class="product">
+                            <div class="row">
+                                <!-- Slider Thumb -->
+                                <div class="col-xs-5">
+                                    <article class="slider-item on-nav">
+                                        <div class="thumb-slider">
+                                            <ul class="slides">
+                                                @if (Model.PictureName != null)
+                                                {
+                                                    <li data-thumb="/images/products/S/@Model.PictureName"> <img src="~/images/products/L/@Model.PictureName" alt=""> </li>
+                                                }
+                                                @foreach (ProductPictureDTO image in ViewBag.ProductPictures)
+                                                {
+                                                    <li data-thumb="/images/products/S/@image.PictureName"> <img src="~/images/products/L/@image.PictureName" alt=""> </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </article>
+                                </div>
+                                <!-- Item Content -->
+                                <div class="col-xs-7">
+                                    <h5>@Model.ProductName</h5>
+                                    <p class="rev"></p>
+                                    <div class="row">
+                                        <div class="col-sm-6"><span class="price">{{(@Model.Price * currency.rate).toFixed(2)}} {{currency.currencyCode}}</span></div>
+                                        @*<div class="col-sm-6">
+                                                <p>Availability: <span class="in-stock">In stock</span></p>
+                                            </div>*@
+                                    </div>
+                                    <!-- List Details -->
+                                    @*<ul class="bullet-round-list">
+                                        <li>@Model.FullDescription</li>
+                                    </ul>*@
+                                    <br />
+                                    @Html.Raw(Model.FullDescription)
+                                    <br /><br />
+                                    <a class="btn-round" style="cursor: pointer;" v-on:click="addProductLocalStorageCard({id: @Model.Id, productName: '@Model.ProductName', price: @Json.Serialize(Model.Price), deliveryRate: @Model.DeliveryRate})"><i class="icon-basket-loaded margin-right-5"></i> @SharedLocalizer["Add to cart"]</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Details Tab Section-->
+                        @*<div class="item-tabs-sec">
+                                <ul class="nav" role="tablist">
+                                    <li role="presentation" class="active"><a href="#pro-detil" role="tab" data-toggle="tab">Описание</a></li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane fade in active" id="pro-detil">
+                                        @Model.FullDescription
+                                    </div>
+                                </div>
+                            </div>*@
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>

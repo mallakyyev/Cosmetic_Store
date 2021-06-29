@@ -1,0 +1,508 @@
+﻿@model Cosmetics.BLL.DTO.ProductModelDTO.EditProductDTO
+@using Cosmetics.BLL.DTO.ConfigurationModelDTO;
+@using Cosmetics.Web
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Edit product"];
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    int lngIndex = 0;
+    int ctgIndex = 0;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                @SharedLocalizer["Edit product"]
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="gridContainer">
+
+            <form asp-action="Edit" id="form" enctype="multipart/form-data">
+                <div class="col-md-12">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            @foreach (LanguageDTO languageDTO in ViewBag.Languages)
+                            {
+                                var prdT = Model.ProductTranslates.FirstOrDefault(p => p.LanguageCulture == languageDTO.Culture);
+
+                                <h3>@languageDTO.Name</h3>
+                                <hr />
+                                if (prdT != null)
+                                {
+                                    <input type="hidden" class="form-control" name="ProductTranslates[@lngIndex].LanguageCulture" value="@languageDTO.Culture" />
+                                    <div class="form-group">
+                                        <label>@SharedLocalizer["Name"] *</label>
+                                        @*<input type="text" class="form-control" name="ProductTranslates[@lngIndex].ProductName" value="@prdT.ProductName" required />*@
+                                        <div id="product-name-@lngIndex"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@SharedLocalizer["Description"] *</label>
+                                        @*<textarea class="form-control" name="ProductTranslates[@lngIndex].FullDescription" rows="3" required>@prdT.FullDescription</textarea>*@
+                                        <div id="description-editor-@lngIndex"></div>
+                                    </div>
+                                    <script>
+                                    $(function () {
+                                        $("#product-name-@lngIndex").dxTextBox({
+                                            name: "ProductTranslates[@lngIndex].ProductName",
+                                            value: @Json.Serialize(prdT.ProductName),
+                                        }).dxValidator({
+                                            validationRules: [{
+                                                type: "required",
+                                                message: '@SharedLocalizer["Enter product name"]'
+                                            }]
+                                        }).dxTextBox("instance");
+
+                                        $("#description-editor-@lngIndex").dxHtmlEditor({
+                                            toolbar: {
+                                                items: [
+                                                    "undo", "redo", "separator",
+                                                    {
+                                                        formatName: "header",
+                                                        formatValues: [false, 1, 2, 3, 4, 5]
+                                                    },
+                                                    "separator",
+                                                    "bold", "italic", "strike", "underline", "separator",
+                                                    "alignLeft", "alignCenter", "alignRight", "alignJustify", "separator",
+                                                    {
+                                                        widget: "dxButton",
+                                                        options: {
+                                                            text: "Show markup",
+                                                            stylingMode: "text",
+                                                            onClick: function () {
+                                                                popupInstance.show();
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            name: `ProductTranslates[@lngIndex].FullDescription`,
+                                            value: `@Html.Raw(prdT.FullDescription)`
+                                        }).dxValidator({
+                                            validationRules: [{
+                                                type: "required",
+                                                message: '@SharedLocalizer["Enter description product"]'
+                                            }]
+                                        }).dxHtmlEditor("instance");
+                                    });
+                                    </script>
+                                    <div class="form-group">
+                                        <label>Meta keywords</label>
+                                        <input type="text" class="form-control" name="ProductTranslates[@lngIndex].MetaKeywords" value="@prdT.MetaKeywords" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Meta title</label>
+                                        <input type="text" class="form-control" name="ProductTranslates[@lngIndex].MetaTitle" value="@prdT.MetaTitle" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Meta description</label>
+                                        <input type="text" class="form-control" name="ProductTranslates[@lngIndex].MetaDescription" value="@prdT.MetaDescription" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    @*<input type="hidden" class="form-control" name="ProductTranslates[@lngIndex].LanguageCulture" value="@languageDTO.Culture" />
+                                    <div class="form-group">
+                                        <label>@SharedLocalizer["Name"] *</label>
+                                        <input type="text" class="form-control" name="ProductTranslates[@lngIndex].ProductName" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>@SharedLocalizer["Description"] *</label>
+                                        <textarea class="form-control" name="ProductTranslates[@lngIndex].FullDescription" rows="3" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Meta keywords</label>
+                                        <input type="text" class="form-control" name="ProductTranslates[@lngIndex].MetaKeywords" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Meta title</label>
+                                        <input type="text" class="form-control" name="ProductTranslates[@lngIndex].MetaTitle" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Meta description</label>
+                                        <input type="text" class="form-control" name="ProductTranslates[@lngIndex].MetaDescription" />
+                                    </div>*@
+                                }
+
+
+                                lngIndex++;
+                            }
+
+                        </div>
+                        <div class="col-md-6">
+                            <h2>@SharedLocalizer["Data"]</h2>
+                            <hr />
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Categories"] *</label>
+                                <div id="CategoriesId">
+                                    @foreach (var cat in Model.CategoriesId)
+                                    {
+                                        <input type="hidden" name="CategoriesId[@ctgIndex]" value="@cat" />
+
+                                        ctgIndex++;
+                                    }
+                                </div>
+                                <div id="treeBox"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Manufacture"] *</label>
+                                <div id="manufactureSelection"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Picture"]</label>
+                                <div id="file"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Pictures"]</label>
+                                <div id="files"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Product code"] *</label>
+                                <div id="productCode"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Price product"] *</label>
+                                <div id="price"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Quantity"] *</label>
+                                <div id="quantityInSet"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Delivery rate"] *</label>
+                                <div id="deliveryRate"></div>
+                            </div>
+                            <div class="form-group">
+                                <div id="published"></div>
+                            </div>
+                            <div class="form-group">
+                                <div id="showOnHomePage"></div>
+                            </div>
+                            <div class="form-group">
+                                <div id="productAsNew"></div>
+                            </div>
+                            <div class="form-group" style="overflow: hidden;">
+                                <div class="col-md-6">
+                                    <div id="newStartDate"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div id="endStartDate"></div>
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+
+                                </div>*@
+                            <br />
+                            <div id="gridContainerPicture"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dx-fieldset">
+                    <br />
+                    <div id="summary"></div>
+                    <br />
+                    <div id="button"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/CustomStore.js"></script>
+    <script>
+        $(function () {
+            var treeView;
+
+            var syncTreeViewSelection = function(treeView, value){
+                if (!value) {
+                    @*console.log(`@Html.Raw(Json.Serialize(Model.CategoriesId))`);*@
+                    treeView.unselectAll();
+                    return;
+                }
+
+                value.forEach(function(key){
+                    treeView.selectItem(key);
+                });
+
+                if (value !== undefined) {
+                    let catId = document.getElementById('CategoriesId');
+                    while (catId.hasChildNodes()) {
+                        catId.removeChild(catId.lastChild);
+                    }
+                    for (i = 0; i < value.length; i++) {
+                        console.log(value[i]);
+                        var input = document.createElement("input");
+                        input.type = "hidden";
+                        input.name = "CategoriesId[" + i + "]";
+                        input.value = value[i];
+                        catId.appendChild(input);
+                    }
+                    //document.getElementById('CategoriesId').innerHTML = value;
+                }
+            };
+
+            var getSelectedItemsKeys = function(items) {
+                var result = [];
+
+                items.forEach(function (item) {
+                    if(item.selected) {
+                        result.push(item.key);
+                    }
+                    if(item.items.length) {
+                        result = result.concat(getSelectedItemsKeys(item.items));
+                    }
+                });
+                return result;
+            };
+
+            var arrCategories = @Html.Raw(Json.Serialize(Model.CategoriesId));
+            //var test = arrCategories.map(String);
+            //console.log(arrCategories);
+
+            $("#treeBox").dxDropDownBox({
+                value: @Html.Raw(Json.Serialize(Model.CategoriesId)),
+                valueExpr: "id",
+                displayExpr: "name",
+                placeholder: '@SharedLocalizer["Enter categories..."]',
+                showClearButton: true,
+                dataSource: getCategories,
+                contentTemplate: function(e){
+                    var value = e.component.option("value"),
+                    $treeView = $("<div>").dxTreeView({
+                        dataSource: e.component.option("dataSource"),
+                        dataStructure: "plain",
+                        keyExpr: "id",
+                        parentIdExpr: "parentCategoryId",
+                        selectionMode: "multiple",
+                        displayExpr: "name",
+                        selectByClick: true,
+                        onContentReady: function(args){
+                            syncTreeViewSelection(args.component, value);
+                        },
+                        selectNodesRecursive: false,
+                        showCheckBoxesMode: "normal",
+                        onItemSelectionChanged: function(args){
+                            var nodes = args.component.getNodes(),
+                                value = getSelectedItemsKeys(nodes);
+
+                            e.component.option("value", value);
+                        }
+                    });
+
+                    treeView = $treeView.dxTreeView("instance");
+
+                    e.component.on("valueChanged", function(args){
+                        var value = args.value;
+                        syncTreeViewSelection(treeView, value);
+                    });
+
+                    return $treeView;
+                }
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter category"]'
+                }]
+            });
+
+            $("#manufactureSelection").dxSelectBox({
+                dataSource: getManufactures,
+                displayExpr: "name",
+                valueExpr: "id",
+                name: 'ManufactureId',
+                searchEnabled: true,
+                value: @Html.Raw(Json.Serialize(Model.ManufactureId)),
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Choose manufacture"]'
+                }]
+            });
+
+            $("#file").dxFileUploader({
+                selectButtonText: '@SharedLocalizer["Choose a picture"]',
+                name: "FormFile",
+                labelText: '@SharedLocalizer["or drag file"]',
+                accept: "*",
+                uploadMode: "or drag",
+                multiple: false
+            });
+
+            $("#files").dxFileUploader({
+                selectButtonText: '@SharedLocalizer["Choose a pictures"]',
+                name: "FormFiles",
+                labelText: '@SharedLocalizer["or drag file"]',
+                accept: "*",
+                uploadMode: "or drag",
+                multiple: true
+            });
+
+            $("#productCode").dxTextBox({
+                name: "ProductCode",
+                value: @Json.Serialize(Model.ProductCode),
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter product code"]'
+                }]
+            });
+
+            $("#price").dxNumberBox({
+                format: "#,##0.00 $",
+                min: 1,
+                name: "Price",
+                value: @Json.Serialize(Model.Price),
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter product price"]'
+                }]
+            });
+
+            $("#quantityInSet").dxNumberBox({
+                value: 0,
+                min: 0,
+                showSpinButtons: true,
+                name: 'QuantityInSet',
+                value: @Json.Serialize(Model.QuantityInSet),
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter quantity products"]'
+                }]
+            });
+
+            $("#deliveryRate").dxNumberBox({
+                format: "#0 $",
+                value: 1,
+                min: 1,
+                showSpinButtons: true,
+                name: 'DeliveryRate',
+                value: @Json.Serialize(Model.DeliveryRate),
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter delivery rate"]'
+                }]
+            });
+
+            let published = '@Model.Published';
+            $("#published").dxCheckBox({
+                text: '@SharedLocalizer["Active"]',
+                name: 'Published',
+                value: (published.toLowerCase() == 'true'),
+            });
+
+            let showOnHomePage = '@Model.ShowOnHomePage';
+            $("#showOnHomePage").dxCheckBox({
+                text: '@SharedLocalizer["Show on home page"]',
+                name: 'ShowOnHomePage',
+                value: (showOnHomePage.toLowerCase() == 'true'),
+            });
+
+            let productAsNew = '@Model.ProductAsNew';
+            $("#productAsNew").dxCheckBox({
+                text: '@SharedLocalizer["New product"]',
+                name: 'ProductAsNew',
+                value: (productAsNew.toLowerCase() == 'true'),
+                onValueChanged: function (data) {
+                    startDate.option("visible", data.value);
+                    endDate.option("visible", data.value);
+                }
+            });
+
+            let startDate = $("#newStartDate").dxDateBox({
+                type: "date",
+                name: "NewStartDate",
+                value: @Json.Serialize(Model.NewStartDate),
+                placeholder: '@SharedLocalizer["Show start"]',
+                visible: (productAsNew.toLowerCase() == 'true')
+            }).data("dxDateBox");
+
+            let endDate = $("#endStartDate").dxDateBox({
+                type: "date",
+                name: "EndStartDate",
+                value: @Json.Serialize(Model.EndStartDate),
+                placeholder: '@SharedLocalizer["Show end"]',
+                visible: (productAsNew.toLowerCase() == 'true')
+            }).data("dxDateBox");
+
+            $("#button").dxButton({
+                text: '@SharedLocalizer["Edit"]',
+                type: "success",
+                useSubmitBehavior: true,
+            });
+            $("#summary").dxValidationSummary({});
+
+
+            $("#gridContainerPicture").dxDataGrid({
+                dataSource: new DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: "/api/ProductAPI/GetProductPicturesId/" + @Json.Serialize(Model.Id),
+                    deleteUrl: "/api/ProductAPI/RemoveImageId",
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),
+                editing: {
+                    useIcons: true,
+                    allowUpdating: false,
+                    allowDeleting: true,
+                    allowAdding: false
+                },
+                showBorders: true,
+              
+                columns: [{
+                    caption: '@SharedLocalizer["Picture"]',
+                    dataField: "pictureName",
+                    //width: 100,
+                    allowFiltering: false,
+                    allowSorting: false,
+                    cellTemplate: function (container, options) {
+                        $("<div>")
+                            .append($("<img>", { "src": '/images/products/S/' + options.value }))
+                            .appendTo(container);
+                    }
+                }
+        ]
+    });
+
+        });
+
+
+        @*$(function () {
+            var now = new Date();
+            var drGroup = "drGroup";
+
+            $("#DocumentName").dxTextBox({
+                name: "DocumentName",
+                value: @Json.Serialize(Model.DocumentName)
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: "Введите наименование документа"
+                }]
+            });
+
+        $("#button").dxButton({
+                text: "Добавить",
+                type: "default",
+            useSubmitBehavior: true,
+            });
+            $("#summary").dxValidationSummary({});
+        });*@
+
+    </script>
+
+}

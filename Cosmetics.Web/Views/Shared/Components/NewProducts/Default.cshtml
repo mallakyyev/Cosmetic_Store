@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Cosmetics.BLL.DTO.ProductModelDTO.ProductDTO>
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Cosmetics.Web
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+
+<section class="padding-top-60 padding-bottom-60">
+    <div class="container">
+
+        <!-- heading -->
+        <div class="heading">
+            <h2>@SharedLocalizer["New products"]</h2>
+            <hr>
+        </div>
+
+
+        @if (Model.Count() == 0)
+        {
+            <div class="container">
+                <div class="emty-product-list">
+                    <p>@SharedLocalizer["The list of new products is empty"]</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="item-slide-5 with-nav">
+                @foreach (var product in Model)
+                {
+                    <div class="product">
+                        <article>
+                            <img class="img-responsive" src="~/images/products/M/@product.PictureName" alt=""> <span class="new-tag">@SharedLocalizer["New"]</span>
+
+                            <!-- Content -->
+                            <span class="tag"></span> <a asp-controller="Product" asp-action="DetailProduct" asp-route-productId="@product.Id" class="tittle">@product.ProductName</a>
+                            <!-- Reviews -->
+                            <p class="rev"></p>
+                            <div class="price">{{(@product.Price * currency.rate).toFixed(2)}} {{currency.currencyCode}}</div>
+                            <a style="cursor: pointer;" v-on:click="addProductLocalStorageCard({id: @product.Id, productName: '@product.ProductName', price: @Json.Serialize(product.Price), deliveryRate: @product.DeliveryRate})" class="cart-btn"><i class="icon-basket-loaded"></i></a>
+                        </article>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

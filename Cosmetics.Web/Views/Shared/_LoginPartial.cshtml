@@ -1,0 +1,56 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Cosmetics.DAL.Models.Users;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Cosmetics.Web
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@if (true)//SignInManager.IsSignedIn(User))
+{
+    @if (true)//User.IsInRole("Admin"))
+    {
+        <li><a asp-area="Admin" asp-controller="Admin" asp-action="Index">@SharedLocalizer["Admin panel"] </a></li>
+    }
+    <li>
+        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@SharedLocalizer["Cabinet"]</a>
+    </li>
+    <li>
+        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button type="submit" class="nav-link btn btn-link text-dark">@SharedLocalizer["Logout"]</button>
+        </form>
+    </li>
+}
+else
+{
+    <li>
+        <a asp-area="Identity" asp-page="/Account/Register">@SharedLocalizer["Register"]</a>
+    </li>
+    <li>
+        <a asp-area="Identity" asp-page="/Account/Login">@SharedLocalizer["Log in"]</a>
+    </li>
+}
+
+@*<ul class="navbar-nav">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+            </li>
+            <li class="nav-item">
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                </form>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            </li>
+        }
+    </ul>*@

@@ -1,0 +1,499 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Cosmetics.Web
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Checkout"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="content">
+    <section class="padding-bottom-60">
+        <div class="container">
+
+            <div style="border: 1px solid #e8e8e8; padding: 40px; margin-top: 20px;">
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="heading">
+                            <h2>@SharedLocalizer["Your data"]</h2>
+                            <hr>
+                        </div>
+                        <form method="post" id="form-container">
+                            <div class="row">
+
+                                <div class="col-md-12" style="margin-bottom: 25px;">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <label>@SharedLocalizer["Full name"] *</label>
+                                            <div id="fullName"></div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <label>@SharedLocalizer["Email"] *</label>
+                                            <div id="email"></div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <label>@SharedLocalizer["Phone"] *</label>
+                                            <div id="phone"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12" style="margin-bottom: 25px;">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <label>@SharedLocalizer["Country"] *</label>
+                                            <div id="countrySelection"></div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <label>@SharedLocalizer["City"] *</label>
+                                            <div id="city"></div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <label>@SharedLocalizer["Address"] *</label>
+                                            <div id="address"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12" style="margin-bottom: 25px;">
+                                    <label>@SharedLocalizer["Comment"]</label>
+                                    <div id="comment"></div>
+                                </div>
+
+                                <div class="col-md-12" style="margin: 50px 0 10px 0;">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label>@SharedLocalizer["Delivery in the country"] (USD)</label>
+                                            <div id="deliveryCountry"></div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label>@SharedLocalizer["Total price"] (USD)</label>
+                                            <div id="totalPrice"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="dx-fieldset">
+                                <br />
+                                <div id="summary"></div>
+                                <br />
+                                <div id="button"></div>
+                            </div>
+                        </form>
+
+                        @*<div class="dx-fieldset">
+                                <div class="dx-fieldset-header">Доставка и общая цена</div>
+                                <div class="dx-field">
+                                    <div class="dx-field-label">Общая цена c доставкой</div>
+                                    <div class="dx-field-value">
+                                        <div id="totalPrice"></div>
+                                    </div>
+                                </div>
+                            </div>*@
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            @*<div class="pro-btn"> <a style="cursor: pointer;" class="btn-round" v-on:click="orderCreate">Оформить заказ</a> </div>*@
+
+
+            @*<div class="demo-container">
+                    <div class="long-title"><h3>Ваши данные</h3></div>
+                    <form id="form-container">
+                        <div id="form"></div>
+                        <div class="dx-fieldset">
+                            <br />
+                            <div id="summary"></div>
+                            <br />
+                            <div id="button"></div>
+                        </div>
+                    </form>
+                </div>*@
+        </div>
+    </section>
+</div>
+
+@section Scripts{
+    <script src="~/js/CustomStore.js"></script>
+    <script>
+        var orderForm = {
+            fullName: null,
+            email: null,
+            phone: null,
+            address: null,
+            countryId: null,
+            city: null,
+            comment: null,
+            deliveryCountry: 0,
+            totalPrice: null
+        };
+
+        $(function () {
+            //let form = $("#form").dxForm({
+            //    colCount: 2,
+            //    formData: orderForm,
+            //    showValidationSummary: true,
+            //    items: [
+            //        {
+            //            dataField: "fullName",
+            //            label: {
+            //                location: "left",
+            //                text: "ФИО"
+            //            },
+            //            editorOptions: {
+            //                value: null,
+            //                width: "100%"
+            //            },
+            //            validationRules: [{
+            //                type: "required",
+            //                message: "Введите ФИО"
+            //            }]
+            //        },
+            //        {
+            //            dataField: "email",
+            //            label: {
+            //                location: "left",
+            //                text: "Email"
+            //            },
+            //            editorOptions: {
+            //                value: null,
+            //                width: "100%"
+            //            },
+            //            validationRules: [{
+            //                type: "required",
+            //                message: "Email is required"
+            //            }, {
+            //                type: "email",
+            //                message: "Email is invalid"
+            //            }]
+            //        },
+            //        {
+            //            dataField: "phone",
+            //            label: {
+            //                location: "left",
+            //                text: "Телефон"
+            //            },
+            //            editorOptions: {
+            //                value: null,
+            //                width: "100%"
+            //            },
+            //            validationRules: [{
+            //                type: "required",
+            //                message: "Введите телефон"
+            //            }]
+            //        },
+            //        {
+            //            dataField: "address",
+            //            label: {
+            //                location: "left",
+            //                text: "Адрес"
+            //            },
+            //            editorOptions: {
+            //                value: null,
+            //                width: "100%"
+            //            },
+            //            validationRules: [{
+            //                type: "required",
+            //                message: "Введите адрес"
+            //            }]
+            //        },
+
+            //        {
+            //            dataField: "country",
+            //            editorType: "dxSelectBox",
+            //            label: {
+            //                location: "left",
+            //                text: "Страна"
+            //            },
+            //            editorOptions: {
+            //                dataSource: getPublishCountries,
+            //                displayExpr: "nameCountry",
+            //                valueExpr: "id",
+            //                searchEnabled: true,
+            //                onValueChanged: function (data) {
+            //                    console.log(data.value);
+            //                    axios.get(`/api/CountryAPI/GetDeliveryPriceCountry/` + data.value)
+            //                        .then(res => {
+            //                            console.log(res.data);
+            //                            let cDelivert = 0;
+            //                            let totalPrice = 0;
+            //                            let localProducts = JSON.parse(localStorage.getItem('cards'));
+            //                            console.log(localProducts);
+            //                            for (let i = 0; i < localProducts.length; i++) {
+            //                                cDelivert = (res.data * localProducts[i].deliveryRateTotal);
+            //                                totalPrice += (localProducts[i].totalPrice + cDelivert);
+            //                            }
+            //                            console.log(cDelivert);
+            //                            console.log(totalPrice);
+            //                            form.option("deliveryCountry", cDelivert.toFixed(2));
+            //                        }).catch(function (error) {
+            //                            console.log(error);
+            //                        });
+            //                }
+            //            },
+            //            validationRules: [{
+            //                type: "required",
+            //                message: "Выберите страну"
+            //            }]
+            //        },
+            //        {
+            //            dataField: "city",
+            //            label: {
+            //                location: "left",
+            //                text: "Город"
+            //            },
+            //            editorOptions: {
+            //                value: null,
+            //                width: "100%"
+            //            },
+            //            validationRules: [{
+            //                type: "required",
+            //                message: "Введите город"
+            //            }]
+            //        },
+            //        {
+            //            colSpan: 2,
+            //            dataField: "comment",
+            //            editorType: "dxTextArea",
+            //            label: {
+            //                location: "left",
+            //                text: "Комментарий"
+            //            },
+            //            editorOptions: {
+            //                height: 100
+            //            }
+            //        },
+            //        {
+            //            dataField: "deliveryCountry",
+            //            label: {
+            //                location: "left",
+            //                text: "Доставка"
+            //            },
+            //            editorOptions: {
+            //                width: "100%",
+            //                disabled: true
+            //            }
+            //        },
+            //        {
+            //            dataField: "totalPrice",
+            //            label: {
+            //                location: "left",
+            //                text: "Общая цена"
+            //            },
+            //            editorOptions: {
+            //                width: "100%",
+            //                disabled: true
+            //            }
+            //        },
+            //        {
+            //            itemType: "button",
+            //            horizontalAlignment: "left",
+            //            buttonOptions: {
+            //                text: "Оформить заказ",
+            //                type: "success",
+            //                useSubmitBehavior: true
+            //            }
+            //        }
+            //    ]
+            //}).dxForm("instance");
+
+            //$("#form-container").on("submit", function (e) {
+            //    console.log(e);
+            //    DevExpress.ui.notify({
+            //        message: "You have submitted the form",
+            //        position: {
+            //            my: "center top",
+            //            at: "center top"
+            //        }
+            //    }, "success", 3000);
+
+            //    e.preventDefault();
+            //});
+
+            //$("#button").dxButton({
+            //    text: "Оформить заказ",
+            //    type: "default",
+            //    useSubmitBehavior: true,
+            //});
+            //$("#summary").dxValidationSummary({});
+
+
+
+
+
+
+            let valueFullName = $("#fullName").dxTextBox({
+                showClearButton: true,
+                name: "FullName",
+                onValueChanged: function (data) {
+                    orderForm.fullName = data.value;
+                }
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter full name"]'
+                }]
+            });
+
+            let valueEmail = $("#email").dxTextBox({
+                showClearButton: true,
+                name: "Email",
+                onValueChanged: function (data) {
+                    orderForm.email = data.value;
+                }
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Email is required"]'
+                }, {
+                    type: "email",
+                    message: '@SharedLocalizer["Email is invalid"]'
+                }]
+            });
+
+            let valuePhone = $("#phone").dxTextBox({
+                showClearButton: true,
+                name: "Phone",
+                onValueChanged: function (data) {
+                    orderForm.phone = data.value;
+                }
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter phone"]'
+                }]
+            });
+
+            let valueCountry = $("#countrySelection").dxSelectBox({
+                dataSource: getPublishCountries,
+                displayExpr: "nameCountry",
+                valueExpr: "id",
+                name: 'CountryId',
+                searchEnabled: true,
+                onValueChanged: function (data) {
+                    orderForm.countryId = data.value;
+                    axios.get(`/api/CountryAPI/GetDeliveryPriceCountry/` + data.value)
+                        .then(res => {
+                            console.log(res.data);
+                            let cDelivert = 0;
+                            let totalPrice = 0;
+                            let localProducts = JSON.parse(localStorage.getItem('cards'));
+                            console.log(localProducts);
+                            for (let i = 0; i < localProducts.length; i++) {
+                                cDelivert += (res.data * localProducts[i].deliveryRateTotal);
+                                totalPrice += (localProducts[i].totalPrice + cDelivert);
+                            }
+                            delCty.option("value", cDelivert.toFixed(2));
+                            tP.option("value", totalPrice.toFixed(2));
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter country"]'
+                }]
+            });
+
+            let valueCity = $("#city").dxTextBox({
+                showClearButton: true,
+                name: "City",
+                onValueChanged: function (data) {
+                    orderForm.city = data.value;
+                }
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter city"]'
+                }]
+            });
+
+            let valueAddress = $("#address").dxTextBox({
+                showClearButton: true,
+                name: "Address",
+                onValueChanged: function (data) {
+                    orderForm.address = data.value;
+                }
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter address"]'
+                }]
+            });
+
+            let valueComment = $("#comment").dxTextArea({
+                height: 100,
+                name: "Comment",
+                onValueChanged: function (data) {
+                    orderForm.comment = data.value;
+                }
+            }).dxTextArea("instance");
+
+            var delCty = $("#deliveryCountry").dxTextBox({
+                readOnly: true,
+                showClearButton: true,
+                value: 0,
+                name: "DeliveryCountry",
+                onValueChanged: function (data) {
+                    orderForm.deliveryCountry = data.value;
+                }
+            }).data("dxTextBox");
+
+            var tP = $("#totalPrice").dxTextBox({
+                readOnly: true,
+                showClearButton: true,
+                name: "TotalPrice",
+                onValueChanged: function (data) {
+                    orderForm.totalPrice = data.value;
+                }
+            }).data("dxTextBox");
+
+            $("#button").dxButton({
+                text: '@SharedLocalizer["Checkout"]',
+                type: "default",
+                useSubmitBehavior: true,
+            });
+            $("#summary").dxValidationSummary({});
+
+            $("#form-container").on("submit", function (e) {
+
+                e.preventDefault();
+
+                let products = JSON.parse(localStorage.getItem('cards'));
+                console.log(products);
+                let cart = {
+                    fullName: orderForm.fullName,
+                    email: orderForm.email,
+                    phone: orderForm.phone,
+                    countryId: orderForm.countryId,
+                    city: orderForm.city,
+                    address: orderForm.address,
+                    comment: orderForm.comment,
+                    shoppingCarts: products
+                }
+                axios.post(`/api/CartAPI/`, cart)
+                    .then(res => {
+                        let url = `@Url.Action("OrderSuccessful","Cart")`;
+                        wrapVue.clearLocalStorageCard();
+                        window.location.replace(url);
+                    })
+
+
+            });
+        });
+    </script>
+
+}

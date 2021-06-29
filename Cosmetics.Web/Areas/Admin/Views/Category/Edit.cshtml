@@ -1,0 +1,150 @@
+﻿@model Cosmetics.BLL.DTO.CatalogModelDTO.EditCategoryDTO
+@using Cosmetics.BLL.DTO.ConfigurationModelDTO;
+@using Cosmetics.Web
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Edit"];
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    int lngIndex = 0;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                @SharedLocalizer["Edit"]
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="gridContainer">
+            <form asp-action="Edit" id="form" enctype="multipart/form-data">
+                <div class="col-md-12">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            @foreach (LanguageDTO languageDTO in ViewBag.Languages)
+                            {
+                                <h2>@languageDTO.Name</h2>
+                                <hr />
+                                {
+                                    var catT = Model.CategoryTranslates.FirstOrDefault(p => p.LanguageCulture == languageDTO.Culture);
+
+                                    if (catT != null)
+                                    {
+                                        <input type="hidden" name="CategoryTranslates[@lngIndex].Id" value="@catT.Id" />
+                                        <input type="hidden" class="form-control" name="CategoryTranslates[@lngIndex].LanguageCulture" value="@languageDTO.Culture" />
+                                        <div class="form-group">
+                                            <label>@SharedLocalizer["Name"]</label>
+                                            <input type="text" class="form-control" name="CategoryTranslates[@lngIndex].Name" value="@catT.Name" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>@SharedLocalizer["Description"]</label>
+                                            <textarea class="form-control" name="CategoryTranslates[@lngIndex].Description" rows="3">@catT.Description</textarea>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" class="form-control" name="CategoryTranslates[@lngIndex].LanguageCulture" value="@languageDTO.Culture" />
+                                        <div class="form-group">
+                                            <label>@SharedLocalizer["Name"]</label>
+                                            <input type="text" class="form-control" name="CategoryTranslates[@lngIndex].Name" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>@SharedLocalizer["Description"]</label>
+                                            <textarea class="form-control" name="CategoryTranslates[@lngIndex].Description" rows="3"></textarea>
+                                        </div>
+                                    }
+                                }
+
+                                lngIndex++;
+                            }
+
+                        </div>
+                        <div class="col-md-6">
+                            <h2>@SharedLocalizer["Data"]</h2>
+                            <hr />
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Parent"]</label>
+                                <div id="categorySelection"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>@SharedLocalizer["Sorting"]</label>
+                                <div id="sortNumber"></div>
+                            </div>
+                            <div class="form-group">
+                                <div id="published"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="dx-fieldset">
+                    <br />
+                    <div id="summary"></div>
+                    <br />
+                    <div id="button"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/CustomStore.js"></script>
+    <script>
+        $(function () {
+            $("#categorySelection").dxSelectBox({
+                dataSource: getCategories,
+                displayExpr: "name",
+                valueExpr: "id",
+                value: @Html.Raw(Json.Serialize(Model.ParentCategoryId)),
+                name: 'ParentCategoryId',
+                searchEnabled: true
+            });
+
+            $("#sortNumber").dxNumberBox({
+                value: 0,
+                min: 0,
+                showSpinButtons: true,
+                name: 'DisplayOrder',
+                value: @Json.Serialize(Model.DisplayOrder),
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Enter a sort list"]'
+                }]
+            });
+
+            let published = '@Model.Published';
+            $("#published").dxCheckBox({
+                value: (published.toLowerCase() == 'true'),
+                text: '@SharedLocalizer["Active"]',
+                name: 'Published',
+            });
+
+            $("#button").dxButton({
+                text: '@SharedLocalizer["Edit"]',
+                type: "success",
+                useSubmitBehavior: true,
+            });
+            $("#summary").dxValidationSummary({});
+        });
+
+        //$("#File").dxFileUploader({
+        //        selectButtonText: "Choose a picture",
+        //        name: "File",
+        //        labelText: "или перетащите файл",
+        //        accept: "*",
+        //        uploadMode: "or drag",
+        //        multiple: false
+        //    });
+    </script>
+
+}

@@ -1,0 +1,34 @@
+﻿@using Cosmetics.Web
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Home page"];
+}
+
+
+@*<section class="slid-sec with-bg-wide">
+    <div class="tp-banner-container">
+        <div class="tp-banner-full">
+            <ul>
+
+                <li data-transition="random" data-slotamount="7" data-masterspeed="300" data-saveperformance="off">
+                    <img src="images/trans-bg.png" alt="slider" data-bgposition="center bottom" data-bgfit="cover" data-bgrepeat="no-repeat">
+                </li>
+
+                <li data-transition="random" data-slotamount="7" data-masterspeed="300" data-saveperformance="off">
+                    <img src="images/trans-bg.png" alt="slider" data-bgposition="center bottom" data-bgfit="cover" data-bgrepeat="no-repeat">
+                </li>
+
+                <li data-transition="random" data-slotamount="7" data-masterspeed="300" data-saveperformance="off">
+                    <img src="images/trans-bg.png" alt="slider" data-bgposition="center bottom" data-bgfit="cover" data-bgrepeat="no-repeat">
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>*@
+
+@await Component.InvokeAsync("NewProducts")
+
+@await Component.InvokeAsync("ShowOnHomeProducts")

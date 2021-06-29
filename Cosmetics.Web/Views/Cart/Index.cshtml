@@ -1,0 +1,74 @@
+﻿@using Cosmetics.Web
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Basket"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="content">
+    <section class="shopping-cart padding-bottom-60" v-if="cards.length !== 0">
+        <div class="container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>@SharedLocalizer["Product"]</th>
+                        <th class="text-center">@SharedLocalizer["Price"]</th>
+                        <th class="text-center">@SharedLocalizer["Quantity"]</th>
+                        <th class="text-center">@SharedLocalizer["Total price"] </th>
+                        <th>&nbsp; </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <!-- Item Cart -->
+                    <tr :key="index" v-for="(item, index) in cards">
+                        <td>
+                            <div class="media">
+                                <div class="media-body">
+                                    <p>{{item.productName}}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center padding-top-60">{{(item.price * currency.rate).toFixed(2)}} {{currency.currencyCode}}</td>
+                        <td class="text-center">
+
+                            <div class="quinty padding-top-20">
+                                <input type="number" :value="item.quantity" min="1" max="100" v-on:input="changeCountProductInToCard(index, $event.target.value)" /> <!-- onChange={(cnt) => self.props.onChangeCountProductInToCard(index, cnt)}  -->
+                            </div>
+                        </td>
+                        <td class="text-center padding-top-60">{{(item.totalPrice * currency.rate).toFixed(2)}} {{currency.currencyCode}}</td>
+                        <td class="text-center padding-top-60">
+                            <a style="cursor: pointer;" class="remove" v-on:click="removeProductInToCard(index)">
+                                <i class="fa fa-close"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <!-- Promotion -->
+            <div class="promo">
+                <div class="coupen">
+                </div>
+
+                <!-- Grand total -->
+                <div class="g-totel">
+                    <h5>@SharedLocalizer["Total price"]: <span>{{(cards.reduce((c, cr) => (c + cr.totalPrice), 0) * currency.rate).toFixed(2)}} {{currency.currencyCode}}</span></h5>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="pro-btn"> <a asp-controller="Cart" asp-action="DeliveryMethod" class="btn-round">@SharedLocalizer["Checkout"]</a> </div>
+        </div>
+    </section>
+    <section class="shopping-cart padding-bottom-60" v-else>
+        <div class="container">
+            <div class="order-success error-page">
+                <h1>@SharedLocalizer["Your basket is empty"]</h1>
+            </div>
+        </div>
+    </section>
+</div>

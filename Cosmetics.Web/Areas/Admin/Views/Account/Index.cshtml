@@ -1,0 +1,121 @@
+﻿@using Cosmetics.Web.Areas.Admin.Utilits;
+@using Cosmetics.Web
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Users"];
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                @SharedLocalizer["Users"]
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="gridContainer">
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/EnumStatus.js"></script>
+    <script>
+        $(function () {
+            let url = `@API.GetAllUsers`;
+
+            $("#gridContainer").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: url,
+                    insertUrl: url,
+                    updateUrl: url,
+                    deleteUrl: url,
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),
+                selection: {
+                    mode: "multiple"
+                },
+                "export": {
+                    enabled: true,
+                    fileName: "Documents",
+                    allowExportSelectedData: true
+                },
+                filterPanel: {
+                    visible: false
+                },
+                filterRow: { visible: false },
+                remoteOperations: true,
+                onRowUpdating: function (e) {
+                    e.newData = Object.assign(e.oldData, e.newData)
+                },
+                scrolling: {
+                    mode: "virtual",
+                    rowRenderingMode: "virtual"
+                },
+                paging: {
+                    pageSize: 100
+                },
+                editing: {
+                    mode: "form",
+                    useIcons: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    allowAdding: false
+                },
+                headerFilter: {
+                    visible: true
+                },
+                wordWrapEnabled: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+                stateStoring: {
+                    enabled: true,
+                    type: "localStorage",
+                    storageKey: "usersAdmin"
+                },
+                columns: [
+                    {
+                        caption: '@SharedLocalizer["Full name"]',
+                        dataField: "fullName",
+                        allowHeaderFiltering: false,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Email"]',
+                        dataField: "email",
+                        allowHeaderFiltering: false,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Confirmation email"]',
+                        dataField: "emailConfirmed",
+                        allowHeaderFiltering: false,
+                    },
+                    {
+                        dataField: "role",
+                        caption: '@SharedLocalizer["Role"]',
+                        width: 150,
+                        lookup: {
+                            dataSource: roles,
+                            displayExpr: "name",
+                            valueExpr: "id"
+                        }
+                    }
+                ]
+            });
+
+        });
+    </script>
+}

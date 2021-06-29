@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Cosmetics.Web
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Delivery"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="blog-single padding-top-30 padding-bottom-60">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="blog-post">
+                    <article>
+                        <h5>@SharedLocalizer["Delivery"]</h5>
+                        <p>
+                            {{settingPortal.deliveryPortal}}
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

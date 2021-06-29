@@ -1,0 +1,417 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Cosmetics.Web
+@using System.Globalization;
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>@ViewData["Title"] - Turkishart.store</title>
+    @*<link href="~/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />*@
+    <link rel="stylesheet" type="text/css" href="~/rs-plugin/css/settings.css" media="screen" />
+
+    <!-- StyleSheets -->
+    <link rel="stylesheet" href="~/css/ionicons.min.css">
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/css/main.css">
+    <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="~/css/responsive.css">
+    <link href="~/css/mystyle.css" rel="stylesheet" />
+
+
+    <!-- Fonts Online -->
+    <link href="https://fonts.googleapis.com/css?family=Lato:100i,300,400,700,900" rel="stylesheet">
+    <!-- JavaScripts -->
+    <script src="~/js/vendors/modernizr.js"></script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link href="~/node_modules/devextreme/dist/css/dx.common.css" rel="stylesheet" />
+    <link href="~/node_modules/devextreme/dist/css/dx.light.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="wrap" class="layout-1"> @*red*@
+        <!-- Top bar -->
+        <div class="top-bar">
+            <div class="container">
+                <p>@SharedLocalizer["Welcome to Turkishart.store!"]</p>
+                <div class="right-sec">
+                    <ul>
+                        <partial name="_LoginPartial" />
+                        @await Html.PartialAsync("_SelectLanguagePartial")
+
+                        <li>
+                            <select v-model="JSON.stringify(currency)" v-on:change="setCurrency($event)" style="background-color: rgb(248, 248, 248); border: none;">
+                                <option v-for="cur in currencies" v-bind:value="JSON.stringify(cur)">{{cur.currencyCode}}</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <div class="container">
+                <div class="logo"> <a asp-controller="Home" asp-action="Index"><img :src="'/images/settings/' + settingPortal.logoPortal" alt=""></a> </div>
+
+                <div class="go-right">
+                    <div class="search-cate">
+                        <form method="get" asp-controller="Product" asp-action="SearchProduct">
+                            <input type="search" name="title" placeholder="@SharedLocalizer["Search products..."]">
+                            <button class="submit" type="submit"><i class="icon-magnifier"></i></button>
+                        </form>
+                    </div>
+                    <!-- Cart Part -->
+                    <ul class="nav navbar-right cart-pop">
+                        <li class="dropdown">
+                            <a asp-controller="Cart" asp-action="Index" class="dropdown-toggle">
+                                <span class="itm-cont">{{quantity}}</span> <i class="flaticon-shopping-bag"></i> <strong>@SharedLocalizer["Basket"]</strong>
+                                <br />
+                                <span>@SharedLocalizer["Qty"]: {{quantity}} - {{(totalSum * currency.rate).toFixed(2)}} {{currency.currencyCode}}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Nav -->
+            <nav class="navbar ownmenu">
+                <div class="container">
+
+                    <!-- Navbar Header -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-open-btn" aria-expanded="false"> <span><i class="fa fa-navicon"></i></span> </button>
+                    </div>
+                    <!-- NAV -->
+                    <div class="collapse navbar-collapse" id="nav-open-btn">
+                        <ul class="nav">
+                            @await Component.InvokeAsync("Categories")
+                        </ul>
+                    </div>
+
+                    <!-- NAV RIGHT -->
+                    @*<div class="nav-right"> <span class="call-mun"><i class="fa fa-phone"></i> <strong>Hotline:</strong> (+100) 123 456 7890</span> </div>*@
+                </div>
+            </nav>
+        </header>
+
+        @RenderBody()
+
+
+        @*<header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="container">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Cosmetics.Web</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                        <partial name="_LoginPartial" />
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>*@
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+
+                <!-- Footer Upside Links -->
+                <div class="foot-link">
+                    <ul>
+                        @await Component.InvokeAsync("Categories")
+                    </ul>
+                </div>
+                <div class="row">
+
+                    <!-- Contact -->
+                    <div class="col-md-4">
+                        <h4>@SharedLocalizer["Contacts"]</h4>
+                        <p>
+                            @SharedLocalizer["Address"]: {{settingPortal.addressPortal}}
+                        </p>
+                        <p>@SharedLocalizer["Phone"]: {{settingPortal.phonePortal}}</p>
+                        <p>@SharedLocalizer["Email"]: {{settingPortal.emailPortal}}</p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <h4>@SharedLocalizer["Information"]</h4>
+                        <ul class="links-footer">
+                            <li><a asp-area="" asp-controller="Home" asp-action="About">@SharedLocalizer["About"]</a></li>
+                            <li><a asp-area="" asp-controller="Home" asp-action="Delivery"> @SharedLocalizer["Delivery"]</a></li>
+                        </ul>
+                    </div>
+
+                    @*<div class="col-md-3">
+                        <h4>Customer Services</h4>
+                        <ul class="links-footer">
+                            <li><a href="#.">Shipping & Returns</a></li>
+                            <li><a href="#."> Secure Shopping</a></li>
+                            <li><a href="#."> International Shipping</a></li>
+                            <li><a href="#."> Affiliates</a></li>
+                            <li><a href="#."> Contact </a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-2">
+                        <h4>Information</h4>
+                        <ul class="links-footer">
+                            <li><a href="#.">Our Blog</a></li>
+                            <li><a href="#."> About Our Shop</a></li>
+                            <li><a href="#."> Secure Shopping</a></li>
+                            <li><a href="#."> Delivery infomation</a></li>
+                            <li><a href="#."> Store Locations</a></li>
+                            <li><a href="#."> FAQs</a></li>
+                        </ul>
+                    </div>*@
+                </div>
+            </div>
+        </footer>
+
+        <!-- Rights -->
+        <div class="rights">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p>Copyright © @DateTime.Now.Year Turkishart.store</p>
+                    </div>
+                    @*<div class="col-sm-6 text-right"> <img src="images/card-icon.png" alt=""> </div>*@
+                </div>
+            </div>
+        </div>
+
+        <!-- End Footer -->
+        <!-- GO TO TOP  -->
+        <a href="#" class="cd-top"><i class="fa fa-angle-up"></i></a>
+        <!-- GO TO TOP End -->
+    </div>
+
+
+
+    <script src="~/js/axios.min.js"></script>
+    <script src="~/js/vue.js"></script>
+
+    <script>
+        var wrapVue = new Vue({
+            el: '#wrap',
+            data: {
+                cards: [],
+                orderForm: {
+                    fullName: null,
+                    email: null,
+                    phone: null,
+                    city: null,
+                    address: null,
+                    comment: null
+                },
+                quantity: 0,
+                totalSum: 0,
+                settingPortal: {},
+                currencies: [],
+                currency: {
+                    id: null, name: null, currencyCode: null, rate: null
+                },
+                //currencyRate: null
+            },
+            created: function () {
+                this.getLocalStorageCard();
+                this.getSettingPortal();
+                this.getCurrencies();
+            },
+            methods: {
+                getLocalStorageCard() {
+                    let vm = this;
+                    let cards = JSON.parse(localStorage.getItem('cards'));
+                    if (cards != null) {
+                        let quantityP = 0;
+                        let totalSumP = 0;
+                        for (let i = 0; i < cards.length; i++) {
+                            quantityP += cards[i].quantity;
+                            totalSumP += cards[i].totalPrice;
+                        }
+                        console.log(quantityP);
+                        vm.quantity = quantityP;
+                        vm.totalSum = totalSumP;
+                        vm.cards = cards;
+                    }
+                },
+                addProductLocalStorageCard(product) {
+                    console.log(product);
+                    let vm = this;
+                    let addFlag = true;
+                    let cards = vm.cards;
+                    for (let i = 0; i < cards.length; i++) {
+                        if (cards[i].productId === parseInt(product.id)) {
+                            cards[i].quantity += 1;
+                            cards[i].totalPrice = (product.price * cards[i].quantity);
+                            cards[i].deliveryRateTotal += product.deliveryRate;
+                            addFlag = false;
+                        }
+                    }
+                    if (addFlag) {
+                        cards.push({
+                            productId: product.id,
+                            productName: product.productName,
+                            price: product.price,
+                            quantity: 1,
+                            totalPrice: product.price,
+                            deliveryRate: product.deliveryRate,
+                            deliveryRateTotal: product.deliveryRate
+                        });
+                    }
+
+                    localStorage.setItem('cards', JSON.stringify(cards));
+                    this.getLocalStorageCard();
+
+                    //vm.cards = cards;
+                },
+                changeCountProductInToCard(inx, cnt) {
+                    let vm = this;
+                    let cards = [...vm.cards];
+                    cards[inx] = {
+                        ...cards[inx],
+                        quantity: parseInt(cnt),
+                        totalPrice: (cards[inx].price * cnt),
+                        deliveryRateTotal: (cnt * cards[inx].deliveryRate)
+                    };
+                    localStorage.setItem('cards', JSON.stringify(cards));
+                    this.getLocalStorageCard();
+                },
+                removeProductInToCard(inx) {
+                    let vm = this;
+                    let cards = vm.cards.filter((el, index) => index !== inx);
+
+                    localStorage.setItem('cards', JSON.stringify(cards));
+                    this.getLocalStorageCard();
+                },
+                clearLocalStorageCard() {
+                    let vm = this;
+                    localStorage.removeItem('cards');
+                    vm.cards = [];
+                    vm.orderForm = {};
+                    vm.quantity = 0;
+                    vm.totalSum = 0;
+                },
+                orderCreate() {
+                    let products = Object.assign(this.cards);
+                    let cart = {
+                        fullName: this.orderForm.fullName,
+                        email: this.orderForm.email,
+                        phone: this.orderForm.phone,
+                        city: this.orderForm.city,
+                        address: this.orderForm.address,
+                        comment: this.orderForm.comment,
+                        shoppingCarts: products
+                    }
+                    axios.post('/api/CartAPI', cart)
+                        .then(res => {
+                            this.clearLocalStorageCard();
+                        });
+                },
+                getSettingPortal() {
+                    axios.get(`/api/SettingPortalAPI/GetSettingPortalTranslate`)
+                        .then(res => {
+                            let vm = this;
+                            let result = res.data;
+
+                            vm.settingPortal = result;
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                },
+                getCurrencies() {
+                    axios.get(`/api/CurrencyAPI/GetPublishCurrencies`)
+                        .then(res => {
+                            let vm = this;
+                            let result = res.data;
+
+                            const currency = localStorage.getItem('currency');
+                            console.log(result);
+                            if (currency == null) {
+                                cur = result.find(x => x.currencyCode === 'USD');
+                                localStorage.setItem('currency', JSON.stringify(cur));
+                                //localStorage.setItem('currencyRate', cur.rate);
+                            }
+
+                            vm.currencies = result;
+                            const currencyLast = JSON.parse(localStorage.getItem('currency'));
+                            //const currencyRateLast = localStorage.getItem('currencyRate');
+                            vm.currency = currencyLast;
+                            //vm.currencyRate = currencyRateLast;
+                            //this.getLocalStorageCurrency();
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                },
+                //getLocalStorageCurrency() {
+                //    let vm = this;
+
+                //    let cur = localStorage.getItem('currency');
+                //    //let curRate = JSON.parse(localStorage.getItem('currencyRate'));
+                //    //console.log(cur);
+                //    vm.currency = cur;
+                //    //vm.currencyRate = curRate;
+                //},
+                setCurrency(event) {
+                    //let stringify = JSON.stringify(event.target.value);
+                    //console.log(stringify);
+                    //let parse = JSON.parse(event.target.value);
+                    //console.log(parse);
+                    let value = JSON.parse(event.target.value);
+                    let vm = this;
+                    if (value != null) {
+                        localStorage.setItem('currency', JSON.stringify(value));
+                        vm.currency = value;
+                    }
+                }
+            }
+        });
+    </script>
+
+    <!-- JavaScripts -->
+    <script src="~/js/vendors/jquery/jquery.min.js"></script>
+    <script src="~/js/vendors/wow.min.js"></script>
+    <script src="~/js/vendors/bootstrap.min.js"></script>
+    <script src="~/js/vendors/own-menu.js"></script>
+    <script src="~/js/vendors/jquery.sticky.js"></script>
+    <script src="~/js/vendors/owl.carousel.min.js"></script>
+
+    <!-- SLIDER REVOLUTION 4.x SCRIPTS  -->
+    <script type="text/javascript" src="~/rs-plugin/js/jquery.tp.t.min.js"></script>
+    <script type="text/javascript" src="~/rs-plugin/js/jquery.tp.min.js"></script>
+    <script src="~/js/main.js"></script>
+    @*<script src="~/node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="~/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>*@
+
+    <script src="~/node_modules/devextreme/dist/js/dx.all.js"></script>
+    <script src="~/node_modules/devextreme/dist/js/localization/dx.messages.en.js"></script>
+    <script src="~/node_modules/devextreme/dist/js/dx.aspnet.data.js"></script>
+    @*<script>
+        console.log(`@CultureInfo.CurrentCulture.TwoLetterISOLanguageName`);
+        console.log(navigator.browserLanguage);
+        DevExpress.localization.locale(`@CultureInfo.CurrentCulture.TwoLetterISOLanguageName`);</script>*@
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

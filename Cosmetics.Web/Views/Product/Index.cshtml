@@ -1,0 +1,181 @@
+﻿@model Cosmetics.BLL.DTO.ProductModelDTO.ProductViewModelDTO
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Cosmetics.Web
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Products"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="content">
+
+    <div class="container">
+        <div class="foot-link" style="margin-bottom: 0;">
+            <ul>
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <li><a asp-area="" asp-controller="Product" asp-action="Index" asp-route-categoryId="@category.Id">@category.Name</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <section class="padding-top-40 padding-bottom-60">
+        <div class="container">
+            <div class="row">
+                @if (Model.ListProductDTO.Count() == 0)
+                {
+                    <div class="col-md-12">
+                        <div class="emty-product-list">
+                            <p>@SharedLocalizer["Product list is empty"]</p>
+                        </div>
+                    </div>
+
+                }
+                else
+                {
+                    <!-- Products -->
+                    <div class="col-md-12">
+                        <div class="col-list">
+
+                            @foreach (var product in Model.ListProductDTO)
+                            {
+                                <div class="product">
+                                    <article>
+                                        <!-- Product img -->
+                                        <div class="media-left">
+                                            <div class="item-img"> <img class="img-responsive" src="~/images/products/M/@product.PictureName" alt="">  </div>
+                                        </div>
+                                        <!-- Content -->
+                                        <div class="media-body">
+                                            <div class="row">
+                                                <!-- Content Left -->
+                                                <div class="col-sm-7">
+                                                    <a asp-area="" asp-controller="Product" asp-action="DetailProduct" asp-route-productId="@product.Id" class="tittle">@product.ProductName</a>
+                                                    <!-- Reviews -->
+                                                    @*<p class="rev"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i> <i class="fa fa-star"></i> <span class="margin-left-10">5 Review(s)</span></p>*@
+                                                    @*<ul class="bullet-round-list">
+                                                <li>@product.FullDescription</li>
+                                            </ul>*@
+                                                    <br /><br />
+                                                    @Html.Raw(product.FullDescription)
+                                                </div>
+                                                <!-- Content Right -->
+                                                <div class="col-sm-5 text-center">
+                                                    <div class="position-center-center">
+                                                        <div class="price">{{(@product.Price * currency.rate).toFixed(2)}} {{currency.currencyCode}}</div>
+                                                        @*<p>Availability: <span class="in-stock">In stock</span></p>*@
+                                                        @*<script>
+                                                    console.log(@Json.Serialize(product));
+                                                </script>*@
+                                                        <a class="btn-round" style="cursor: pointer;" v-on:click="addProductLocalStorageCard({id: @product.Id, productName: '@product.ProductName', price: @Json.Serialize(product.Price), deliveryRate: @product.DeliveryRate})"><i class="icon-basket-loaded"></i> @SharedLocalizer["Add to cart"]</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                    <!--Pagination-->
+                    <div class="col-sm-12" style="text-align: center;">
+                        <ul class="pagination">
+                            @if (Model.PageViewModel.HasPreviousPage)
+                            {
+                                <li>
+                                    <a asp-controller="Product" asp-action="Index"
+                                       asp-route-categoryId="@ViewBag.CategoryId"
+                                       asp-route-page="@(Model.PageViewModel.PageNumber - 1)" aria-label="Previous">
+                                        <i class="fa fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <a aria-label="Previous">
+                                        <i class="fa fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            }
+                            @if (Model.PageViewModel.HasNextPage)
+                            {
+                                <li>
+                                    <a asp-controller="Product" asp-action="Index"
+                                       asp-route-categoryId="@ViewBag.CategoryId"
+                                       asp-route-page="@(Model.PageViewModel.PageNumber + 1)" aria-label="Next">
+                                        <i class="fa fa-angle-right"></i>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <a aria-label="Next">
+                                        <i class="fa fa-angle-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+
+
+            </div>
+        </div>
+    </section>
+
+</div>
+
+@*<section className="padding-top-40 padding-bottom-60">
+        <div className="container">
+            <div className="row">
+                <div className="col-md-12">
+                    <div className="col-list">
+                        @foreach (var product in Model)
+                        {
+                            <div className="product">
+                                <article>
+                                    <div className="media-left">
+                                        <div className="item-img">
+                                            <img className="img-responsive" src="~/images/products/@product.PictureName" alt="" />
+                                        </div>
+                                    </div>
+                                    <div className="media-body">
+                                        <div className="row">
+                                            <div className="col-sm-7">
+                                                <a href="#" className="tittle">{product.productName}</a>
+
+                                                <ul className="bullet-round-list">
+                                                    <li>@product.FullDescription</li>
+                                                </ul>
+                                            </div>
+                                            <div className="col-sm-5 text-center">
+                                                <div className="position-center-center">
+                                                    <div className="price">@product.Price</div>
+                                                    <a className="btn-round" style="cursor: pointer;">
+                                                        <i className="icon-basket-loaded"></i> Добавить в корзину
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        }
+
+
+                        <div className="pro-btn">
+                            Кнопка загрузки
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>*@

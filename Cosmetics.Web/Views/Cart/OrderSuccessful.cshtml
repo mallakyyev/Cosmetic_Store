@@ -1,0 +1,20 @@
+﻿@using Cosmetics.Web
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Successful order"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="content">
+    <section class="padding-bottom-60">
+        <div class="container">
+            <div class="order-success">
+                <i class="fa fa-check"></i>
+                <h6>@SharedLocalizer["Congratulations! Your order has been successfully placed"]</h6>
+            </div>
+        </div>
+    </section>
+</div>

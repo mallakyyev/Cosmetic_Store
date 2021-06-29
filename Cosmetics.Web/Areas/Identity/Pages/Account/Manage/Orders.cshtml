@@ -1,0 +1,56 @@
+﻿@page
+@model Cosmetics.Web.Areas.Identity.Pages.Account.Manage.OrdersModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Orders"];
+    ViewData["ActivePage"] = ManageNavPages.Orders;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div class="row">
+    @if (Model.checkoutPickupPointListDTOs.Count() > 0)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">@Localizer["NumberAndDateOrders"]</th>
+                    <th scope="col">@Localizer["ProductName"]</th>
+                    <th scope="col">@Localizer["Price"]</th>
+                    <th scope="col">@Localizer["Quantity"]</th>
+                    <th scope="col">@Localizer["TotalPrice"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.checkoutPickupPointListDTOs)
+                {
+                    <tr>
+                        <th scope="row">@order.Id - @order.OrderCreateDate</th>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    @foreach (var cart in order.ShoppingCarts)
+                    {
+                        <tr>
+                            <th scope="row"></th>
+                            <td>@cart.ProductName</td>
+                            <td>@cart.Price</td>
+                            <td>@cart.Quantity</td>
+                            <td>@cart.TotalPrice</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            @Localizer["You have no orders at this time"]
+        </div>
+    }
+</div>

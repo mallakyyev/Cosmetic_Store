@@ -1,0 +1,241 @@
+﻿@using Cosmetics.Web.Areas.Admin.Utilits;
+@using Cosmetics.Web
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Orders"];
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                @SharedLocalizer["Orders"]
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="gridContainer">
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/EnumStatus.js"></script>
+    <script>
+        $(function () {
+            var item = JSON.parse(localStorage.getItem("ordersAdmin"));
+            if (item) {
+                item.pageIndex = 0;
+                localStorage.setItem("ordersAdmin", JSON.stringify(item));
+            }
+
+            let url = `@API.GetAllOrders`;
+            let urlDetail = `@API.GetOrdersDetail`;
+            var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
+            $("#gridContainer").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: url,
+                    insertUrl: url,
+                    updateUrl: url,
+                    deleteUrl: url,
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),
+                selection: {
+                    mode: "multiple"
+                },
+                "export": {
+                    enabled: true,
+                    fileName: "Orders",
+                    allowExportSelectedData: true
+                },
+                filterPanel: {
+                    visible: false
+                },
+                filterRow: { visible: false },
+                remoteOperations: true,
+                onRowUpdating: function (e) {
+                    e.newData = Object.assign(e.oldData, e.newData)
+                },
+                scrolling: {
+                    mode: "virtual"
+                },
+                paging: {
+                    pageSize: 30
+                },
+                editing: {
+                    form: "form",
+                    useIcons: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    allowAdding: false
+                },
+                headerFilter: {
+                    visible: true
+                },
+                wordWrapEnabled: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+                stateStoring: {
+                    enabled: true,
+                    type: "localStorage",
+                    storageKey: "ordersAdmin"
+                },
+                columns: [
+                    {
+                        caption: '@SharedLocalizer["Full name"]',
+                        dataField: "fullName",
+                        allowHeaderFiltering: false,
+                        width: "250"
+                    },
+                    {
+                        caption: '@SharedLocalizer["Phone"]',
+                        dataField: "phone",
+                        allowHeaderFiltering: false
+                    },
+                    {
+                        caption: '@SharedLocalizer["Address"]',
+                        dataField: "address",
+                        allowHeaderFiltering: false
+                    },
+                    {
+                        caption: '@SharedLocalizer["Email"]',
+                        dataField: "email",
+                        allowHeaderFiltering: false
+                    },
+                    {
+                        caption: '@SharedLocalizer["City"]',
+                        dataField: "city",
+                        allowHeaderFiltering: false
+                    },
+                    {
+                        caption: '@SharedLocalizer["Status"]',
+                        dataField: "orderStatus",
+                        width: "130",
+                        allowHeaderFiltering: false,
+                        lookup: {
+                            dataSource: orderStatus,
+                            displayExpr: "name",
+                            valueExpr: "id"
+                        }
+                    },
+                    {
+                        type: "buttons",
+                        width: 110,
+                        buttons: [
+                            {
+                                hint: '@SharedLocalizer["Receipt"]',
+                                icon: "orderedlist",
+                                onClick: function (e) {
+                                    var data = e.row.data;
+                                    window.open('@Url.Action("CheckOrder","Cart")?id=' + data.id, '_blank')
+                                }
+                            },
+                            "edit",
+                            "delete"
+                        ]
+                    }
+                ],
+                masterDetail: {
+                    enabled: true,
+                    template: function (container, options) {
+                        var item = options.data;
+
+                        $("<div>")
+                            .addClass("master-detail-caption")
+                            .text(item.fullName)
+                            .appendTo(container);
+
+                        $("<div>")
+                            .dxDataGrid({
+                                dataSource: DevExpress.data.AspNet.createStore({
+                                    key: "id",
+                                    loadUrl: urlDetail + "?checkoutPickupPointId=" + item.id,
+                                    deleteUrl: '/api/CartAPI/DeleteShoppingCart',
+                                    onBeforeSend: function (method, ajaxOptions) {
+                                        ajaxOptions.xhrFields = { withCredentials: true };
+                                    }
+                                }),
+                                editing: {
+                                    useIcons: true,
+                                    allowUpdating: false,
+                                    allowDeleting: true,
+                                    allowAdding: false
+                                },
+                                columnAutoWidth: true,
+                                showBorders: true,
+                                columns: [
+                                    {
+                                        caption: '@SharedLocalizer["Product"]',
+                                        dataField: "productName",
+                                    },
+                                    {
+                                        caption: '@SharedLocalizer["Price"]',
+                                        dataField: "price",
+                                        dataType: "decimal"
+                                    },
+                                    {
+                                        caption: '@SharedLocalizer["Quantity"]',
+                                        dataField: "quantity",
+                                        dataType: "number"
+                                    },
+                                    {
+                                        caption: '@SharedLocalizer["Total price"]',
+                                        dataField: "totalPrice",
+                                        dataType: "decimal"
+                                    },
+                                    {
+                                        type: "buttons",
+                                        width: 110,
+                                        buttons: [
+                                            "delete"
+                                        ]
+                                    }
+                                ],
+                                summary: {
+                                    totalItems: [
+                                        {
+                                            column: "quantity",
+                                            summaryType: "sum",
+                                            displayFormat: '@SharedLocalizer["Qty"]: {0}'
+                                            //customizeText: {
+                                            //    function(e) {
+                                            //        return "Количество: " + e.value;
+                                            //    }
+                                            //}
+                                        },
+                                        {
+                                            column: "totalPrice",
+                                            summaryType: "sum",
+                                            valueFormat: {
+                                                format: "currency",
+                                                precision: 2
+                                            },
+                                            displayFormat: '@SharedLocalizer["Total price"]: {0}'
+                                            //customizeText: {
+                                            //    function(e) {
+                                            //        return "Итого: " + e.value;
+                                            //    }
+                                            //}
+                                        }
+                                    ]
+                                }
+                            }).appendTo(container);
+                    }
+                }
+            });
+        });
+    </script>
+}
